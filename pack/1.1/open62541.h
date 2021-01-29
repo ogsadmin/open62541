@@ -1,4 +1,4 @@
-/* THIS IS A SINGLE-FILE DISTRIBUTION CONCATENATED FROM THE OPEN62541 SOURCES
+﻿/* THIS IS A SINGLE-FILE DISTRIBUTION CONCATENATED FROM THE OPEN62541 SOURCES
  * visit http://open62541.org/ for information about this software
  * Git-Revision: v1.1.5-1-ge1650d8a
  */
@@ -303,6 +303,10 @@ void UA_free(void* ptr); //de-allocate memory previously allocated with UA_mallo
 #endif
 #ifndef UA_realloc
 #define UA_realloc realloc
+#endif
+
+#ifdef __CODEGEARC__
+#define _snprintf_s(a,b,c,...) snprintf(a,b,__VA_ARGS__)
 #endif
 
 /* 3rd Argument is the string */
@@ -1042,6 +1046,8 @@ typedef uint64_t  uintmax_t;
 # define UA_RESTRICT __restrict
 #elif defined(__GNUC__)
 # define UA_RESTRICT __restrict__
+#elif defined(__CODEGEARC__)
+# define UA_RESTRICT _RESTRICT
 #else
 # define UA_RESTRICT restrict
 #endif
