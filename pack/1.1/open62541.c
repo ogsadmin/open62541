@@ -7018,7 +7018,7 @@ String_copy(UA_String const *src, UA_String *dst, const UA_DataType *_) {
                                          &UA_TYPES[UA_TYPES_BYTE]);
     if(retval == UA_STATUSCODE_GOOD)
         dst->length = src->length;
-    return retval;
+	return retval;
 }
 
 static void
@@ -7445,13 +7445,13 @@ UA_Variant_setScalarCopy(UA_Variant *v, const void *p,
     void *n = UA_malloc(type->memSize);
     if(!n)
         return UA_STATUSCODE_BADOUTOFMEMORY;
-    UA_StatusCode retval = UA_copy(p, n, type);
+	UA_StatusCode retval = UA_copy(p, n, type);
     if(retval != UA_STATUSCODE_GOOD) {
         UA_free(n);
         //cppcheck-suppress memleak
         return retval;
-    }
-    UA_Variant_setScalar(v, n, type);
+	}
+	UA_Variant_setScalar(v, n, type);
     //cppcheck-suppress memleak
     return UA_STATUSCODE_GOOD;
 }
@@ -7999,9 +7999,9 @@ const UA_copySignature copyJumpTable[UA_DATATYPEKINDS] = {
 
 UA_StatusCode
 UA_copy(const void *src, void *dst, const UA_DataType *type) {
-    memset(dst, 0, type->memSize); /* init */
-    UA_StatusCode retval = copyJumpTable[type->typeKind](src, dst, type);
-    if(retval != UA_STATUSCODE_GOOD)
+	memset(dst, 0, type->memSize); /* init */
+	UA_StatusCode retval = copyJumpTable[type->typeKind](src, dst, type);
+	if(retval != UA_STATUSCODE_GOOD)
         UA_clear(dst, type);
     return retval;
 }
@@ -30648,7 +30648,7 @@ onRead(UA_Server *server, const UA_NodeId *sessionId, void *sessionContext,
        const UA_NodeId *nodeid, void *context,
        const UA_NumericRange *range, const UA_DataValue *data) {
     UA_Variant value;
-    UA_Variant_init(&value);
+	UA_Variant_init(&value);
     const UA_NodePropertyContext *nodeContext = (const UA_NodePropertyContext*)context;
     const UA_NodeId *myNodeId = &nodeContext->parentNodeId;
 
@@ -43509,34 +43509,41 @@ __UA_Client_readAttribute(UA_Client *client, const UA_NodeId *nodeId,
     request.nodesToReadSize = 1;
     UA_ReadResponse response = UA_Client_Service_read(client, request);
     UA_StatusCode retval = response.responseHeader.serviceResult;
-    if(retval == UA_STATUSCODE_GOOD) {
-        if(response.resultsSize == 1)
-            retval = response.results[0].status;
-        else
-            retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
-    }
-    if(retval != UA_STATUSCODE_GOOD) {
-        UA_ReadResponse_clear(&response);
-        return retval;
-    }
+	if(retval == UA_STATUSCODE_GOOD) {
+		if(response.resultsSize == 1)
+			retval = response.results[0].status;
+		else
+			retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
+	}
+	if(retval != UA_STATUSCODE_GOOD) {
+		UA_ReadResponse_clear(&response);
+		return retval;
+	}
 
-    /* Set the StatusCode */
-    UA_DataValue *res = response.results;
-    if(res->hasStatus)
-        retval = res->status;
+	/* Set the StatusCode */
+	UA_DataValue *res = response.results;
+	if(res->hasStatus)
+		retval = res->status;
 
-    /* Return early of no value is given */
-    if(!res->hasValue) {
-        retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
-        UA_ReadResponse_clear(&response);
-        return retval;
-    }
+	/* Return early of no value is given */
+	if(!res->hasValue) {
+		retval = UA_STATUSCODE_BADUNEXPECTEDERROR;
+		UA_ReadResponse_clear(&response);
+		return retval;
+	}
 
-    /* Copy value into out */
-    if(attributeId == UA_ATTRIBUTEID_VALUE) {
-        memcpy(out, &res->value, sizeof(UA_Variant));
-        UA_Variant_init(&res->value);
-    } else if(attributeId == UA_ATTRIBUTEID_NODECLASS) {
+	/* Copy value into out */
+	if(attributeId == UA_ATTRIBUTEID_VALUE) {
+		if (res->value.type->typeKind == UA_DATATYPEKIND_EXTENSIONOBJECT) {
+			UA_ExtensionObject* eo = (UA_ExtensionObject*)(res->value.data);
+			UA_ExtensionObjectEncoding encoding = eo->encoding;
+			int length = eo->content.encoded.body.length;
+			UA_Byte* data = eo->content.encoded.body.data;
+			UA_NodeId nodeId = eo->content.encoded.typeId;
+		}
+		memcpy(out, &res->value, sizeof(UA_Variant));
+		UA_Variant_init(&res->value);
+	} else if(attributeId == UA_ATTRIBUTEID_NODECLASS) {
         memcpy(out, (UA_NodeClass*)res->value.data, sizeof(UA_NodeClass));
     } else if(UA_Variant_isScalar(&res->value) &&
               res->value.type == outDataType) {
@@ -57133,9 +57140,12 @@ UA_Openssl_Init (void) {
     static UA_Int16 bInit = 0;
     if (bInit == 1)
         return;
-    OpenSSL_add_all_algorithms ();
+# if OPENSSL_API_COMPAT < 0x10100000L
+    // only needed for old OpenSSL API
+	OpenSSL_add_all_algorithms ();
 	ERR_load_crypto_strings ();
-    bInit = 1;
+ #endif
+   bInit = 1;
 #endif    
 }
 
@@ -63203,17 +63213,20 @@ UA_CertificateVerification_Verify (void *                verificationContext,
 
     X509_STORE_set_flags(store, 0);
     opensslRet = X509_STORE_CTX_init (storeCtx, store, certificateX509, 
-                                      ctx->skIssue);
+									  ctx->skIssue);
     if (opensslRet != 1) {
-        ret = UA_STATUSCODE_BADINTERNALERROR;
+		ret = UA_STATUSCODE_BADINTERNALERROR;
         goto cleanup;
     }
-    (void) X509_STORE_CTX_trusted_stack (storeCtx, ctx->skTrusted);
-
-    /* Set crls to ctx */
+#if OPENSSL_API_COMPAT < 0x10100000L
+	(void) X509_STORE_CTX_trusted_stack (storeCtx, ctx->skTrusted);
+#else
+	(void) X509_STORE_CTX_set0_trusted_stack (storeCtx, ctx->skTrusted);
+#endif
+	/* Set crls to ctx */
     if (sk_X509_CRL_num (ctx->skCrls) > 0) {
         X509_STORE_CTX_set0_crls (storeCtx, ctx->skCrls);
-    }
+	}
 
 #if OPENSSL_VERSION_NUMBER >= 0x1010000fL
     if (X509_STORE_CTX_get_check_issued (storeCtx) (storeCtx,certificateX509, certificateX509) != 1) {
