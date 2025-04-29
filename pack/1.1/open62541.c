@@ -4715,7 +4715,7 @@ struct UA_MonitoredItem {
     LIST_ENTRY(UA_MonitoredItem) listEntry;
     UA_Subscription *subscription; /* Local MonitoredItem if the subscription is NULL */
     UA_UInt32 monitoredItemId;
-    UA_UInt32 clientHandle;
+	UA_UInt32 clientHandle;
     UA_Boolean registered; /* Was the MonitoredItem registered in Userland with
                               the callback? */
 
@@ -9049,13 +9049,17 @@ DECODE_BINARY(LocalizedText) {
  * possible to reuse UA_findDataType */
 static const UA_DataType *
 UA_findDataTypeByBinaryInternal(const UA_NodeId *typeId, Ctx *ctx) {
-    /* We only store a numeric identifier for the encoding nodeid of data types */
-    if(typeId->identifierType != UA_NODEIDTYPE_NUMERIC)
-        return NULL;
+	/* We only store a numeric identifier for the encoding nodeid of data types */
+
+	// HE: removed the following two lines, see https://github.com/open62541/open62541/issues/3787
+#ifdef IGNORE_HE_BUGFIXES
+	if(typeId->identifierType != UA_NODEIDTYPE_NUMERIC)
+		return NULL;
+#endif
 
     /* Always look in built-in types first
      * (may contain data types from all namespaces) */
-    for(size_t i = 0; i < UA_TYPES_COUNT; ++i) {
+	for(size_t i = 0; i < UA_TYPES_COUNT; ++i) {
         if(UA_TYPES[i].binaryEncodingId == typeId->identifier.numeric &&
            UA_TYPES[i].typeId.namespaceIndex == typeId->namespaceIndex)
             return &UA_TYPES[i];
@@ -9327,8 +9331,8 @@ Variant_decodeBinaryUnwrapExtensionObject(UA_Variant *dst, Ctx *ctx) {
         /* Reset and decode as ExtensionObject */
         dst->type = &UA_TYPES[UA_TYPES_EXTENSIONOBJECT];
         ctx->pos = old_pos;
-        UA_NodeId_clear(&typeId);
-    }
+	}
+    UA_NodeId_clear(&typeId);
 
     /* Allocate memory */
     dst->data = UA_new(dst->type);
@@ -15830,8 +15834,8 @@ const UA_DataType UA_TYPES[UA_TYPES_COUNT] = {
     UA_TYPENAME("DataValue") /* .typeName */
     {0, UA_NODEIDTYPE_NUMERIC, {23LU}}, /* .typeId */
     sizeof(UA_DataValue), /* .memSize */
-    UA_TYPES_DATAVALUE, /* .typeIndex */
-    UA_DATATYPEKIND_DATAVALUE, /* .typeKind */
+	UA_TYPES_DATAVALUE, /* .typeIndex */
+	UA_DATATYPEKIND_DATAVALUE, /* .typeKind */
     false, /* .pointerFree */
     false, /* .overlayable */
     0, /* .membersSize */
@@ -65702,7 +65706,7 @@ UA_ServerNetworkLayerTCP(UA_ConnectionConfig config, UA_UInt16 port,
 
 typedef struct TCPClientConnection {
     struct addrinfo hints, *server;
-    UA_DateTime connStart;
+	UA_DateTime connStart;
     UA_String endpointUrl;
     UA_UInt32 timeout;
 } TCPClientConnection;
@@ -65740,21 +65744,27 @@ UA_StatusCode
 UA_ClientConnectionTCP_poll(UA_Client *client, void *data, UA_UInt32 timeout) {
     UA_Connection *connection = (UA_Connection*) data;
     if(connection->state == UA_CONNECTIONSTATE_CLOSED)
-        return UA_STATUSCODE_BADDISCONNECT;
-    if(connection->state == UA_CONNECTIONSTATE_ESTABLISHED)
-        return UA_STATUSCODE_GOOD;
+		return UA_STATUSCODE_BADDISCONNECT;
+	if(connection->state == UA_CONNECTIONSTATE_ESTABLISHED)
+		return UA_STATUSCODE_GOOD;
 
-    TCPClientConnection *tcpConnection = (TCPClientConnection*) connection->handle;
-    UA_SOCKET clientsockfd = connection->sockfd;
-    UA_ClientConfig *config = UA_Client_getConfig(client);
+	TCPClientConnection *tcpConnection = (TCPClientConnection*) connection->handle;
+	UA_SOCKET clientsockfd = connection->sockfd;
+	UA_ClientConfig *config = UA_Client_getConfig(client);
 
-    /* Connection timeout? */
-    if((UA_Double) (UA_DateTime_nowMonotonic() - tcpConnection->connStart)
-       > tcpConnection->timeout * UA_DATETIME_MSEC ) {
-        ClientNetworkLayerTCP_close(connection);
-        UA_LOG_WARNING(&config->logger, UA_LOGCATEGORY_NETWORK, "Timed out");
-        return UA_STATUSCODE_BADDISCONNECT;
-    }
+	if (tcpConnection == NULL) {
+		ClientNetworkLayerTCP_close(connection);
+		UA_LOG_WARNING(&config->logger, UA_LOGCATEGORY_NETWORK, "Handle is zero!!??!!");
+		return UA_STATUSCODE_BADDISCONNECT;
+	}
+
+	/* Connection timeout? */
+	if((UA_Double) (UA_DateTime_nowMonotonic() - tcpConnection->connStart)
+	   > tcpConnection->timeout * UA_DATETIME_MSEC ) {
+		ClientNetworkLayerTCP_close(connection);
+		UA_LOG_WARNING(&config->logger, UA_LOGCATEGORY_NETWORK, "Timed out");
+		return UA_STATUSCODE_BADDISCONNECT;
+	}
 
     /* On linux connect may immediately return with ECONNREFUSED but we still
      * want to try to connect. Thus use a loop and retry until timeout is
