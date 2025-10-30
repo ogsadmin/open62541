@@ -914,7 +914,7 @@ UA_UtcTime_encodeBinary(const UA_UtcTime *src, UA_Byte **bufPos, const UA_Byte *
 }
 static UA_INLINE UA_StatusCode
 UA_UtcTime_decodeBinary(const UA_ByteString *src, size_t *offset, UA_UtcTime *dst) {
-    return UA_decodeBinary(src, offset, dst, &UA_TYPES[UA_TYPES_UTCTIME], NULL);
+	return UA_decodeBinary(src, offset, dst, &UA_TYPES[UA_TYPES_UTCTIME], NULL);
 }
 
 /* UserIdentityToken */
@@ -924,7 +924,7 @@ UA_UserIdentityToken_calcSizeBinary(const UA_UserIdentityToken *src) {
 }
 static UA_INLINE UA_StatusCode
 UA_UserIdentityToken_encodeBinary(const UA_UserIdentityToken *src, UA_Byte **bufPos, const UA_Byte *bufEnd) {
-    return UA_encodeBinary(src, &UA_TYPES[UA_TYPES_USERIDENTITYTOKEN], bufPos, &bufEnd, NULL, NULL);
+	return UA_encodeBinary(src, &UA_TYPES[UA_TYPES_USERIDENTITYTOKEN], bufPos, &bufEnd, NULL, NULL);
 }
 static UA_INLINE UA_StatusCode
 UA_UserIdentityToken_decodeBinary(const UA_ByteString *src, size_t *offset, UA_UserIdentityToken *dst) {
@@ -22581,7 +22581,7 @@ UA_Server_updateCertificate(UA_Server *server,
             if(!sp)
                 return UA_STATUSCODE_BADINTERNALERROR;
             sp->updateCertificateAndPrivateKey(sp, *newCertificate, *newPrivateKey);
-        }
+		}
         i++;
     }
 
@@ -22594,13 +22594,13 @@ UA_Server_updateCertificate(UA_Server *server,
 
 UA_SecurityPolicy *
 UA_SecurityPolicy_getSecurityPolicyByUri(const UA_Server *server,
-                                         const UA_ByteString *securityPolicyUri) {
-    for(size_t i = 0; i < server->config.securityPoliciesSize; i++) {
-        UA_SecurityPolicy *securityPolicyCandidate = &server->config.securityPolicies[i];
-        if(UA_ByteString_equal(securityPolicyUri, &securityPolicyCandidate->policyUri))
-            return securityPolicyCandidate;
-    }
-    return NULL;
+										 const UA_ByteString *securityPolicyUri) {
+	for(size_t i = 0; i < server->config.securityPoliciesSize; i++) {
+		UA_SecurityPolicy *securityPolicyCandidate = &server->config.securityPolicies[i];
+		if(UA_ByteString_equal(securityPolicyUri, &securityPolicyCandidate->policyUri))
+			return securityPolicyCandidate;
+	}
+	return NULL;
 }
 
 #ifdef UA_ENABLE_ENCRYPTION
@@ -33853,7 +33853,7 @@ selectEndpointAndTokenPolicy(UA_Server *server, UA_SecureChannel *channel,
         /* Match the UserTokenType */
         const UA_DataType *tokenDataType = identityToken->content.decoded.type;
         for(size_t j = 0; j < desc->userIdentityTokensSize; j++) {
-            const UA_UserTokenPolicy *pol = &desc->userIdentityTokens[j];
+			const UA_UserTokenPolicy *pol = &desc->userIdentityTokens[j];
 
             /* Part 4, Section 5.6.3.2, Table 17: A NULL or empty
              * UserIdentityToken should be treated as Anonymous */
@@ -33955,7 +33955,7 @@ Service_ActivateSession(UA_Server *server, UA_SecureChannel *channel,
     /* Find the matching Endpoint with UserTokenPolicy */
     const UA_EndpointDescription *ed = NULL;
     const UA_UserTokenPolicy *utp = NULL;
-    selectEndpointAndTokenPolicy(server, channel, &request->userIdentityToken, &ed, &utp);
+	selectEndpointAndTokenPolicy(server, channel, &request->userIdentityToken, &ed, &utp);
     if(!ed) {
         response->responseHeader.serviceResult = UA_STATUSCODE_BADIDENTITYTOKENINVALID;
         goto rejected;
@@ -42302,7 +42302,7 @@ activateSessionAsync(UA_Client *client) {
             UA_ActivateSessionRequest_clear(&request);
             return UA_STATUSCODE_BADOUTOFMEMORY;
         }
-        request.userIdentityToken.content.decoded.data = t;
+		request.userIdentityToken.content.decoded.data = t;
         request.userIdentityToken.content.decoded.type = &UA_TYPES[UA_TYPES_ANONYMOUSIDENTITYTOKEN];
         request.userIdentityToken.encoding = UA_EXTENSIONOBJECT_DECODED;
     }
@@ -42337,9 +42337,9 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
                      void *response) {
     client->endpointsHandshake = false;
 
-    UA_GetEndpointsResponse *resp = (UA_GetEndpointsResponse*)response;
-    /* GetEndpoints not possible. Fail the connection */
-    if(resp->responseHeader.serviceResult != UA_STATUSCODE_GOOD) {
+	UA_GetEndpointsResponse *resp = (UA_GetEndpointsResponse*)response;
+	/* GetEndpoints not possible. Fail the connection */
+	if(resp->responseHeader.serviceResult != UA_STATUSCODE_GOOD) {
         client->connectStatus = resp->responseHeader.serviceResult;
         UA_LOG_ERROR(&client->config.logger, UA_LOGCATEGORY_CLIENT,
                      "GetEndpointRequest failed with error code %s",
@@ -42347,6 +42347,30 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
         UA_GetEndpointsResponse_clear(resp);
         return;
     }
+
+#if 1 // ::HE
+		{
+			/* Log the local client security policies */
+			const char *securityModeNames[3] = {"None", "Sign", "SignAndEncrypt"};
+			const char *userTokenTypeNames[4] = {"Anonymous", "UserName", "Certificate", "IssuedToken"};
+
+			UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT, "Received server endpoints - local client config security policies:");
+			for(size_t i = 0; i < client->config.securityPoliciesSize; i++) {
+				UA_SecurityPolicy *securityPolicy = &client->config.securityPolicies[i];
+
+				UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+						"    [%d] Client SecurityPolicy (%.*s)",
+						i,(int)securityPolicy->policyUri.length, securityPolicy->policyUri.data);
+			}
+
+			/* log the client user identity token */
+			//const UA_DataType *tokenType = client->config.userIdentityToken.content.decoded.type;
+
+			/* Show the server endpoint information */
+			UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT, "Server endpoints:");
+		}
+#endif
+
 
     UA_Boolean endpointFound = false;
     UA_Boolean tokenFound = false;
@@ -42356,11 +42380,11 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
     // TODO: compare endpoint information with client->endpointUri
     UA_EndpointDescription* endpointArray = resp->endpoints;
     size_t endpointArraySize = resp->endpointsSize;
-    for(size_t i = 0; i < endpointArraySize; ++i) {
+	for(size_t i = 0; i < endpointArraySize; ++i) {
         UA_EndpointDescription* endpoint = &endpointArray[i];
         /* Look out for binary transport endpoints.
          * Note: Siemens returns empty ProfileUrl, we will accept it as binary. */
-        if(endpoint->transportProfileUri.length != 0 &&
+		if(endpoint->transportProfileUri.length != 0 &&
            !UA_String_equal (&endpoint->transportProfileUri, &binaryTransport))
             continue;
 
@@ -42391,25 +42415,66 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
             continue;
         }
 
-        /* SecurityPolicy available? */
-        if(!getSecurityPolicy(client, endpoint->securityPolicyUri)) {
-            UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
-                        "Rejecting endpoint %lu: security policy not available",
-                        (long unsigned)i);
-            continue;
-        }
+		/* SecurityPolicy available? */
+		if(!getSecurityPolicy(client, endpoint->securityPolicyUri)) {
+#if 1 // ::HE
+			{
+				const char *securityModeNames[3] = {"None", "Sign", "SignAndEncrypt"};
+				UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+							"    [%d/%d] Server Endpoint: %.*s: SecurityMode %d (%s), SecurityPolicy (%.*s)",
+							i, endpointArraySize, (int)endpoint->endpointUrl.length, endpoint->endpointUrl.data,
+							endpoint->securityMode, securityModeNames[endpoint->securityMode - 1],
+							(int)endpoint->securityPolicyUri.length, endpoint->securityPolicyUri.data);
+			}
+#endif
+			UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+						"Rejecting endpoint %lu: security policy not available",
+						(long unsigned)i);
+			continue;
+		}
 
-        endpointFound = true;
+		endpointFound = true;
 
-        /* Look for a user token policy with an anonymous token */
-        for(size_t j = 0; j < endpoint->userIdentityTokensSize; ++j) {
-            UA_UserTokenPolicy* tokenPolicy = &endpoint->userIdentityTokens[j];
-            const UA_DataType *tokenType = client->config.userIdentityToken.content.decoded.type;
+		/* Endpoint found - show all offered server connection policies */
+#if 1 // ::HE
+		{
+			/* Log the selected endpoint */
+			const char *securityModeNames[3] = {"None", "Sign", "SignAndEncrypt"};
+			const char *userTokenTypeNames[4] = {"Anonymous", "UserName", "Certificate", "IssuedToken"};
+
+			UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+						"    [%d/%d] Server Endpoint: %.*s: SecurityMode %d (%s), SecurityPolicy (%.*s)",
+						i, endpointArraySize, (int)endpoint->endpointUrl.length, endpoint->endpointUrl.data,
+						endpoint->securityMode, securityModeNames[endpoint->securityMode - 1],
+						(int)endpoint->securityPolicyUri.length, endpoint->securityPolicyUri.data);
+
+			for(size_t j = 0; j < endpoint->userIdentityTokensSize; ++j) {
+				UA_UserTokenPolicy* tokenPolicy = &endpoint->userIdentityTokens[j];
+				const UA_DataType *tokenType = client->config.userIdentityToken.content.decoded.type;
+
+				UA_String *securityPolicyUri = &tokenPolicy->securityPolicyUri;
+				if(securityPolicyUri->length == 0)
+					securityPolicyUri = &endpoint->securityPolicyUri;
+
+				/* Log the selected UserTokenPolicy */
+				UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+							"        [%d] UserTokenPolicy %.*s with UserTokenType %s and SecurityPolicy %.*s",
+							j, (int)tokenPolicy->policyId.length, tokenPolicy->policyId.data,
+							userTokenTypeNames[tokenPolicy->tokenType],
+							(int)securityPolicyUri->length, securityPolicyUri->data);
+			}
+		}
+#endif
+
+		/* Look for a user token policy with an anonymous token */
+		for(size_t j = 0; j < endpoint->userIdentityTokensSize; ++j) {
+			UA_UserTokenPolicy* tokenPolicy = &endpoint->userIdentityTokens[j];
+			const UA_DataType *tokenType = client->config.userIdentityToken.content.decoded.type;
 
             /* Usertokens also have a security policy... */
             if(tokenPolicy->tokenType != UA_USERTOKENTYPE_ANONYMOUS && 
                tokenPolicy->securityPolicyUri.length > 0 &&
-               !getSecurityPolicy(client, tokenPolicy->securityPolicyUri)) {
+			   !getSecurityPolicy(client, tokenPolicy->securityPolicyUri)) {
                 UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
                             "Rejecting UserTokenPolicy %lu in endpoint %lu: "
                             "security policy '%.*s' not available", (long unsigned)j, (long unsigned)i,
@@ -42431,16 +42496,16 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
                 UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
                             "Rejecting UserTokenPolicy %lu (anonymous) in endpoint %lu: "
                             "configuration doesn't match", (long unsigned)j, (long unsigned)i);
-                continue;
+				continue;
             }
-            if(tokenPolicy->tokenType == UA_USERTOKENTYPE_USERNAME &&
+			if(tokenPolicy->tokenType == UA_USERTOKENTYPE_USERNAME &&
                tokenType != &UA_TYPES[UA_TYPES_USERNAMEIDENTITYTOKEN]) {
                 UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
-                            "Rejecting UserTokenPolicy %lu (username) in endpoint %lu: "
-                            "configuration doesn't match", (long unsigned)j, (long unsigned)i);
+							"Rejecting UserTokenPolicy %lu (username) in endpoint %lu: "
+							"configuration doesn't match", (long unsigned)j, (long unsigned)i);
                 continue;
             }
-            if(tokenPolicy->tokenType == UA_USERTOKENTYPE_CERTIFICATE &&
+			if(tokenPolicy->tokenType == UA_USERTOKENTYPE_CERTIFICATE &&
                tokenType != &UA_TYPES[UA_TYPES_X509IDENTITYTOKEN]) {
                 UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
                             "Rejecting UserTokenPolicy %lu (certificate) in endpoint %lu: "
@@ -42458,27 +42523,27 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
             /* Endpoint with matching usertokenpolicy found */
 
 #if UA_LOGLEVEL <= 300
-            const char *securityModeNames[3] = {"None", "Sign", "SignAndEncrypt"};
-            const char *userTokenTypeNames[4] = {"Anonymous", "UserName",
-                                                 "Certificate", "IssuedToken"};
-            UA_String *securityPolicyUri = &tokenPolicy->securityPolicyUri;
-            if(securityPolicyUri->length == 0)
-                securityPolicyUri = &endpoint->securityPolicyUri;
+			const char *securityModeNames[3] = {"None", "Sign", "SignAndEncrypt"};
+			const char *userTokenTypeNames[4] = {"Anonymous", "UserName",
+												 "Certificate", "IssuedToken"};
+			UA_String *securityPolicyUri = &tokenPolicy->securityPolicyUri;
+			if(securityPolicyUri->length == 0)
+				securityPolicyUri = &endpoint->securityPolicyUri;
 
-            /* Log the selected endpoint */
-            UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
-                        "Selected Endpoint %.*s with SecurityMode %s and SecurityPolicy %.*s",
-                        (int)endpoint->endpointUrl.length, endpoint->endpointUrl.data,
-                        securityModeNames[endpoint->securityMode - 1],
-                        (int)endpoint->securityPolicyUri.length,
-                        endpoint->securityPolicyUri.data);
+			/* Log the selected endpoint */
+			UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+						"Selected Endpoint %.*s with SecurityMode %s and SecurityPolicy %.*s",
+						(int)endpoint->endpointUrl.length, endpoint->endpointUrl.data,
+						securityModeNames[endpoint->securityMode - 1],
+						(int)endpoint->securityPolicyUri.length,
+						endpoint->securityPolicyUri.data);
 
-            /* Log the selected UserTokenPolicy */
-            UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
-                        "Selected UserTokenPolicy %.*s with UserTokenType %s and SecurityPolicy %.*s",
-                        (int)tokenPolicy->policyId.length, tokenPolicy->policyId.data,
-                        userTokenTypeNames[tokenPolicy->tokenType],
-                        (int)securityPolicyUri->length, securityPolicyUri->data);
+			/* Log the selected UserTokenPolicy */
+			UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+						"Selected UserTokenPolicy %.*s with UserTokenType %s and SecurityPolicy %.*s",
+						(int)tokenPolicy->policyId.length, tokenPolicy->policyId.data,
+						userTokenTypeNames[tokenPolicy->tokenType],
+						(int)securityPolicyUri->length, securityPolicyUri->data);
 #endif
 
             /* Move to the client config */
@@ -54001,7 +54066,7 @@ activateSession_default(UA_Server *server, UA_AccessControl *ac,
     }
 
     /* Username and password */
-    if(userIdentityToken->content.decoded.type == &UA_TYPES[UA_TYPES_USERNAMEIDENTITYTOKEN]) {
+	if(userIdentityToken->content.decoded.type == &UA_TYPES[UA_TYPES_USERNAMEIDENTITYTOKEN]) {
         const UA_UserNameIdentityToken *userToken =
             (UA_UserNameIdentityToken*)userIdentityToken->content.decoded.data;
 
@@ -55745,9 +55810,9 @@ createEndpoint(UA_ServerConfig *conf, UA_EndpointDescription *endpoint,
     endpoint->securityLevel = (UA_Byte) securityMode;
 
     /* Enable all login mechanisms from the access control plugin  */
-    UA_StatusCode retval = UA_Array_copy(conf->accessControl.userTokenPolicies,
+	UA_StatusCode retval = UA_Array_copy(conf->accessControl.userTokenPolicies,
                                          conf->accessControl.userTokenPoliciesSize,
-                                         (void **)&endpoint->userIdentityTokens,
+										 (void **)&endpoint->userIdentityTokens,
                                          &UA_TYPES[UA_TYPES_USERTOKENPOLICY]);
     if(retval != UA_STATUSCODE_GOOD)
         return retval;
