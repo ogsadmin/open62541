@@ -52,5 +52,10 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
     Write-Host -ForegroundColor Red "`n`n*** Make failed. Exiting ... ***"
     exit $LASTEXITCODE
 }
+
+# Finally, generate the embarcadero radstudio import library 
+# (the windows world uses OMF, Embarcadero uses COFF for 32-bit compilers)
+implib.exe -a bin\Debug\open62541-embt.lib bin\Debug\open62541.dll
+
 cd ..
 #Remove-Item -Path build -Recurse -Force
