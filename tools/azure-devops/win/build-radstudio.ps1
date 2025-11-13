@@ -35,7 +35,7 @@ if ($env:CC_SHORTNAME -eq "mingw") {
 $cmake_cnf="$vcpkg_toolchain", "$vcpkg_triplet", "-G`"$env:GENERATOR`""
 
 Write-Host -ForegroundColor Green "`n###################################################################"
-Write-Host -ForegroundColor Green "`n##### Testing $env:CC_NAME (.dll) #####`n"
+Write-Host -ForegroundColor Green "`n##### Building RadStudio 32-Bit shared library $env:CC_NAME (.dll) #####`n"
 New-Item -ItemType directory -Path "build"
 
 cd build
@@ -44,8 +44,10 @@ cd build
         -DBUILD_SHARED_LIBS:BOOL=ON `
 		-DUA_BUILD_EXAMPLES:BOOL=ON `
 		-DUA_ENABLE_JSON_ENCODING:BOOL=ON `
+                -DUA_ENABLE_NODESETLOADER:BOOL=ON `
         -DCMAKE_BUILD_TYPE=Debug `
         -DUA_FORCE_WERROR=ON `
+        -A Win32 `
         ..
 & cmake --build .
 if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
@@ -55,6 +57,7 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
 
 # Finally, generate the embarcadero radstudio import library 
 # (the windows world uses OMF, Embarcadero uses COFF for 32-bit compilers)
+# see: https://blogs.embarcadero.com/how-to-achieve-common-tasks-with-the-new-clang-toolchain-in-12-1/#Creating_DLL_Import_Libraries
 implib.exe -a bin\Debug\open62541-embt.lib bin\Debug\open62541.dll
 
 cd ..

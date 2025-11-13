@@ -14,6 +14,8 @@ rem Set the environment variables
 ::
 set CC_SHORTNAME=msvc
 set GENERATOR=Visual Studio 17 2022
+set UA_ARCHITECTURE=win32
+set CMAKE_BUILD_TYPE=Debug
 ::
 rem Run the powershell build script...
 ::
