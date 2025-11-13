@@ -17,4 +17,4 @@ set GENERATOR=Visual Studio 17 2022
 ::
 rem Run the powershell build script...
 ::
-powershell -executionpolicy remotesigned .\tools\azure-devops\win\build.ps1
+powershell -executionpolicy bypass .\tools\azure-devops\win\build-radstudio.ps1
