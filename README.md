@@ -13,6 +13,33 @@ The library is [available](https://github.com/open62541/open62541/releases) in s
 [![Fuzzing Status](https://oss-fuzz-build-logs.storage.googleapis.com/badges/open62541.svg)](https://bugs.chromium.org/p/oss-fuzz/issues/list?sort=-opened&can=1&q=proj:open62541)
 [![codecov](https://codecov.io/gh/open62541/open62541/branch/master/graph/badge.svg)](https://codecov.io/gh/open62541/open62541)
 
+## Building locally for Windows
+
+To build manually/locally on Windows with Microsoft Visual Studion 2022, the following prerequisites are needed:
+- Install 
+    <cmake>
+    d:
+    cd \componentes
+    mkdir vcpkg
+    cd vcpkg
+    git clone https://github.com/microsoft/vcpkg.git
+    cd vcpkg
+    .\bootstrap-vcpkg.bat
+    vcpkg install mbedtls:x64-windows-static
+    vcpkg install check:x64-windows-static
+    $env:VCPKG_ROOT = "C:\path\to\vcpkg"
+    $env:PATH = "$env:VCPKG_ROOT;$env:PATH"
+
+    ACHTUNG: Cmake hat scheinbar then Pfad fest kodiert - also alles nach c:\vcpkg verschieben... (ARGH!!!)
+
+1.  
+    $env:VCPKG_ROOT = "D:\components\vcpkg\vcpkg"
+    $env:PATH = "$env:VCPKG_ROOT;$env:PATH"
+    $env:CC_SHORTNAME = "msvc"
+    $env:GENERATOR = "Visual Studio 17 2022"
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    .\tools\azure-devops\win\build-local.ps1
+
 ## Features
 
 open62541 implements an OPC UA SDK with support for servers, clients and PubSub (publish-subscribe) communication.
