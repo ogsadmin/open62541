@@ -29,7 +29,9 @@ if ($env:CC_SHORTNAME -eq "mingw") {
     clang --version
 } else {
     $vcpkg_toolchain = '-DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"'
-    $vcpkg_triplet = '-DVCPKG_TARGET_TRIPLET="x64-windows-static"'
+    #$vcpkg_triplet = '-DVCPKG_TARGET_TRIPLET="x64-windows-static"'
+    # we do a 32-bit build:
+    $vcpkg_triplet = '-DVCPKG_TARGET_TRIPLET="x86-windows-static"'
 }
 
 $cmake_cnf="$vcpkg_toolchain", "$vcpkg_triplet", "-G`"$env:GENERATOR`""
@@ -41,10 +43,12 @@ New-Item -ItemType directory -Path "build"
 cd build
 
 & cmake $cmake_cnf `
+	-DCMAKE_POLICY_VERSION_MINIMUM="3.10" `
         -DBUILD_SHARED_LIBS:BOOL=ON `
-		-DUA_BUILD_EXAMPLES:BOOL=ON `
-		-DUA_ENABLE_JSON_ENCODING:BOOL=ON `
-                -DUA_ENABLE_NODESETLOADER:BOOL=ON `
+	-DUA_BUILD_EXAMPLES:BOOL=ON `
+	-DUA_ENABLE_JSON_ENCODING:BOOL=ON `
+        -DUA_ENABLE_NODESETLOADER:BOOL=ON `
+	-DUA_NAMESPACE_ZERO::STRING="FULL" `
         -DCMAKE_BUILD_TYPE=Debug `
         -DUA_FORCE_WERROR=ON `
         -A Win32 `
@@ -58,7 +62,7 @@ if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) {
 # Finally, generate the embarcadero radstudio import library 
 # (the windows world uses OMF, Embarcadero uses COFF for 32-bit compilers)
 # see: https://blogs.embarcadero.com/how-to-achieve-common-tasks-with-the-new-clang-toolchain-in-12-1/#Creating_DLL_Import_Libraries
-implib.exe -a bin\Debug\open62541-embt.lib bin\Debug\open62541.dll
+implib -a bin\Debug\open62541-embt.lib bin\Debug\open62541.dll
 
 cd ..
 #Remove-Item -Path build -Recurse -Force

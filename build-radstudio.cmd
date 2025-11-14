@@ -9,6 +9,7 @@
 ::  .\bootstrap-vcpkg.bat
 ::  .\vcpkg install check:x64-windows-static
 ::  .\vcpkg install mbedtls:x64-windows-static
+::  .\vcpkg install libxml2:x86-windows-static
 ::
 rem Set the environment variables
 ::
@@ -16,6 +17,10 @@ set CC_SHORTNAME=msvc
 set GENERATOR=Visual Studio 17 2022
 set UA_ARCHITECTURE=win32
 set CMAKE_BUILD_TYPE=Debug
+::
+:: Make sure all submodules are current
+::
+git submodule update --recursive
 ::
 rem Run the powershell build script...
 ::

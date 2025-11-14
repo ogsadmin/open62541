@@ -39,7 +39,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	UA_Server *server = UA_Server_newFromFile(json_config);
 
 	// load the nodeset data
-	for (int cnt = 1; cnt < argc; cnt++) {
+	for (int cnt = 2; cnt < argc; cnt++) {
 		if (UA_StatusCode_isBad(UA_Server_loadNodeset(server, argv[cnt], NULL))) {
 			printf("Nodeset %s could not be loaded, exit\n", argv[cnt]);
 			return EXIT_FAILURE;

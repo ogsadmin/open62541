@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.328,=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Unit1.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.719,=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Unit1.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.424,=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Project1PCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.985,=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Project1PCH1.h</Transaction>
+    <Transaction>2025.11.13 16:17:26.489,=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Project1PCH1.h</Transaction>
+    <Transaction>2025.11.13 16:17:26.502,=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\File2.cpp</Transaction>
+    <Transaction>2025.11.13 16:23:59.421,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_configPCH1.h=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Project1PCH1.h</Transaction>
+    <Transaction>2025.11.13 16:23:59.442,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\File2.cpp=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\File2.cpp</Transaction>
+    <Transaction>2025.11.13 16:23:59.448,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config.cbproj=C:\Users\holger\Documents\Embarcadero\Studio\Projekte\Project1.cbproj</Transaction>
+    <Transaction>2025.11.13 16:25:09.367,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config_main.cpp=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\File2.cpp</Transaction>
+    <Transaction>2025.11.13 17:20:40.052,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\plugins\ua_log_stdout.c</Transaction>
+    <Transaction>2025.11.13 17:43:36.240,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\plugins\ua_log_stdout.c=</Transaction>
+    <Transaction>2025.11.13 17:56:03.597,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\plugins\ua_nodesetloader.c</Transaction>
+    <Transaction>2025.11.13 18:02:31.540,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\backends\open62541\src\import.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.482,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\AliasList.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.515,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\CharAllocator.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.536,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\InternalRefService.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.553,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\NamespaceList.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.603,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\Nodeset.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.651,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\NodesetLoader.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.672,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\Parser.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.713,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\PrintfLogger.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.740,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\Sort.c</Transaction>
+    <Transaction>2025.11.13 18:04:36.761,=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\deps\nodesetLoader\src\Value.c</Transaction>
+    <Transaction>2025.11.14 16:08:51.891,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config_nodesetPCH1.h=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_configPCH1.h</Transaction>
+    <Transaction>2025.11.14 16:08:51.913,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config_nodeset.cbproj=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config.cbproj</Transaction>
+    <Transaction>2025.11.14 16:08:57.873,D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config_nodeset.cbproj=D:\Sandboxes\ogs\ogs-trunk\src\LuaOPCUA\open62541-ogsadmin\examples\embarcadero\json_config_nodeset.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>
