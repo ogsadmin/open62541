@@ -42388,28 +42388,32 @@ responseGetEndpoints(UA_Client *client, void *userdata, UA_UInt32 requestId,
            !UA_String_equal (&endpoint->transportProfileUri, &binaryTransport))
             continue;
 
-        /* Valid SecurityMode? */
-        if(endpoint->securityMode < 1 || endpoint->securityMode > 3) {
-            UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+		UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+			"    [%d] SecurityMode %d, SecurityPolicy (%.*s)",
+			i,endpoint->securityMode, (int)endpoint->securityPolicyUri.length, endpoint->securityPolicyUri.data);
+
+		/* Valid SecurityMode? */
+		if(endpoint->securityMode < 1 || endpoint->securityMode > 3) {
+			UA_LOG_WARNING(&client->config.logger, UA_LOGCATEGORY_CLIENT,
                         "Rejecting endpoint %lu: invalid security mode",
                         (long unsigned)i);
             continue;
-        }
+		}
 
         /* Selected SecurityMode? */
         if(client->config.securityMode > 0 &&
            client->config.securityMode != endpoint->securityMode) {
-            UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
-                        "Rejecting endpoint %lu: security mode doesn't match",
-                        (long unsigned)i);
+			UA_LOG_WARNING(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+						"Rejecting endpoint %lu: security mode doesn't match (config %d)",
+                        (long unsigned)i, client->config.securityMode);
             continue;
         }
 
         /* Matching SecurityPolicy? */
         if(client->config.securityPolicyUri.length > 0 &&
            !UA_String_equal(&client->config.securityPolicyUri,
-                            &endpoint->securityPolicyUri)) {
-            UA_LOG_INFO(&client->config.logger, UA_LOGCATEGORY_CLIENT,
+							&endpoint->securityPolicyUri)) {
+			UA_LOG_WARNING(&client->config.logger, UA_LOGCATEGORY_CLIENT,
                         "Rejecting endpoint %lu: security policy doesn't match",
                         (long unsigned)i);
             continue;
